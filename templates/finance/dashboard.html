@@ -16,8 +16,15 @@
     </div>
 </div>
 
-<div class="card">
-    <h2>Últimas transações</h2>
+<div class="actions-bar">
+    <a href="{% url 'transaction-create' %}" class="btn btn-primary">+ Nova transação</a>
+</div>
+
+<div class="card card-flush">
+    <div class="card-header">
+        <h2>Últimas transações</h2>
+        <a href="{% url 'transaction-list' %}" class="see-all-link">Ver todas</a>
+    </div>
     {% if transactions %}
         <ul class="transaction-list">
             {% for t in transactions %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Excluir transação{% endblock %}
+{% block content %}
+<div class="container-sm card">
+    <h1>Excluir transação</h1>
+    <p>
+        Tem certeza que deseja excluir "<strong>{{ object.description }}</strong>" (R$ {{ object.amount }})? Essa ação não pode ser desfeita.
+    </p>
+    <form method="post" class="form-actions">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Excluir</button>
+        <a href="{% url 'transaction-list' %}" class="cancel-link">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Transações{% endblock %}
+{% block content %}
+<div class="list-header">
+    <div class="month-nav">
+        <a href="?year={{ prev_year }}&month={{ prev_month }}">&larr;</a>
+        <h1>{{ month_date|date:"F \d\e Y" }}</h1>
+        <a href="?year={{ next_year }}&month={{ next_month }}">&rarr;</a>
+    </div>
+    <a href="{% url 'transaction-create' %}" class="btn btn-primary">+ Nova transação</a>
+</div>
+
+<div class="summary-grid">
+    <div class="card">
+        <p class="summary-label">Receitas</p>
+        <p class="summary-value text-income">R$ {{ income }}</p>
+    </div>
+    <div class="card">
+        <p class="summary-label">Despesas</p>
+        <p class="summary-value text-expense">R$ {{ expense }}</p>
+    </div>
+    <div class="card">
+        <p class="summary-label">Saldo</p>
+        <p class="summary-value">R$ {{ balance }}</p>
+    </div>
+</div>
+
+<div class="card card-flush">
+    {% if transactions %}
+        <ul class="transaction-list">
+            {% for t in transactions %}
+                <li>
+                    <div>
+                        <p class="transaction-desc">{{ t.description }}</p>
+                        <p class="transaction-meta">{{ t.category.name }} · {{ t.date }}</p>
+                    </div>
+                    <div class="transaction-amount-group">
+                        <p class="transaction-amount {% if t.category.type == 'IN' %}text-income{% else %}text-expense{% endif %}">
+                            {% if t.category.type == 'IN' %}+{% else %}-{% endif %}R$ {{ t.amount }}
+                        </p>
+                        <a href="{% url 'transaction-update' t.pk %}" class="transaction-action">Editar</a>
+                        <a href="{% url 'transaction-delete' t.pk %}" class="transaction-action danger">Excluir</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% if is_paginated %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?year={{ year }}&month={{ month }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+                <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?year={{ year }}&month={{ month }}&page={{ page_obj.next_page_number }}">Próxima</a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <p class="card-empty">Nenhuma transação neste mês ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

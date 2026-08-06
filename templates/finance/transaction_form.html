@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{% if form.instance.pk %}Editar transação{% else %}Nova transação{% endif %}{% endblock %}
+{% block content %}
+<div class="container-sm card">
+    <h1>{% if form.instance.pk %}Editar transação{% else %}Nova transação{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                    <p class="error-text">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="{% url 'transaction-list' %}" class="cancel-link">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -12,6 +12,9 @@
         <div class="navbar-inner">
             <div class="navbar-left">
                 <a href="{% url 'dashboard' %}" class="brand">LHG Finance</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'transaction-list' %}" class="nav-link">Transações</a>
+                {% endif %}
             </div>
             {% if user.is_authenticated %}
                 <div class="navbar-right">

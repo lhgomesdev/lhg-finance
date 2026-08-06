@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LHG Finance{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <script>
+        (function () {
+            var saved = localStorage.getItem("theme");
+            if (saved) {
+                document.documentElement.setAttribute("data-theme", saved);
+            }
+        })();
+    </script>
 </head>
 <body>
     <nav class="navbar">
@@ -16,15 +24,16 @@
                     <a href="{% url 'transaction-list' %}" class="nav-link">Transações</a>
                 {% endif %}
             </div>
-            {% if user.is_authenticated %}
-                <div class="navbar-right">
+            <div class="navbar-right">
+                {% if user.is_authenticated %}
                     <span class="username">{{ user.username }}</span>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="link-button">Sair</button>
                     </form>
-                </div>
-            {% endif %}
+                {% endif %}
+                <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Alternar tema claro/escuro">🌙</button>
+            </div>
         </div>
     </nav>
 
@@ -42,5 +51,30 @@
 
     {% if debug %}{% django_browser_reload_script %}{% endif %}
     {% block extra_js %}{% endblock %}
+    <script>
+        (function () {
+            var root = document.documentElement;
+            var button = document.getElementById("theme-toggle");
+            var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+            function isDark() {
+                var current = root.getAttribute("data-theme");
+                return current ? current === "dark" : prefersDark;
+            }
+
+            function updateIcon() {
+                button.textContent = isDark() ? "☀️" : "🌙";
+            }
+
+            button.addEventListener("click", function () {
+                var next = isDark() ? "light" : "dark";
+                root.setAttribute("data-theme", next);
+                localStorage.setItem("theme", next);
+                updateIcon();
+            });
+
+            updateIcon();
+        })();
+    </script>
 </body>
 </html>

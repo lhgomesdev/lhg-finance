@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Resumo{% endblock %}
+{% block content %}
+<div class="summary-grid">
+    <div class="card">
+        <p class="summary-label">Receitas do mês</p>
+        <p class="summary-value text-income">R$ {{ income }}</p>
+    </div>
+    <div class="card">
+        <p class="summary-label">Despesas do mês</p>
+        <p class="summary-value text-expense">R$ {{ expense }}</p>
+    </div>
+    <div class="card">
+        <p class="summary-label">Saldo do mês</p>
+        <p class="summary-value">R$ {{ balance }}</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Últimas transações</h2>
+    {% if transactions %}
+        <ul class="transaction-list">
+            {% for t in transactions %}
+                <li>
+                    <div>
+                        <p class="transaction-desc">{{ t.description }}</p>
+                        <p class="transaction-meta">{{ t.category.name }} · {{ t.date }}</p>
+                    </div>
+                    <p class="transaction-amount {% if t.category.type == 'IN' %}text-income{% else %}text-expense{% endif %}">
+                        {% if t.category.type == 'IN' %}+{% else %}-{% endif %}R$ {{ t.amount }}
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="card-empty">Nenhuma transação neste mês ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

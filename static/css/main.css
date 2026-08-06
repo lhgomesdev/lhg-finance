@@ -373,3 +373,25 @@ a {
 .pagination a:hover {
     color: #4f46e5;
 }
+
+/* Gráfico */
+.chart-card {
+    margin-bottom: 1.5rem;
+}
+
+.chart-card h2 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.125rem;
+}
+
+.chart-empty {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.chart-wrap {
+    max-width: 320px;
+    margin: 0 auto;
+}

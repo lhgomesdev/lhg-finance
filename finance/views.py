@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
@@ -21,11 +23,21 @@ def dashboard(request):
     income = transactions.filter(category__type=Category.Type.INCOME).aggregate(total=Sum("amount"))["total"] or 0
     expense = transactions.filter(category__type=Category.Type.EXPENSE).aggregate(total=Sum("amount"))["total"] or 0
 
+    expense_by_category = (
+        transactions.filter(category__type=Category.Type.EXPENSE)
+        .values("category__name", "category__color")
+        .annotate(total=Sum("amount"))
+        .order_by("-total")
+    )
+
     context = {
         "transactions": transactions[:10],
         "income": income,
         "expense": expense,
         "balance": income - expense,
+        "chart_labels": json.dumps([row["category__name"] for row in expense_by_category]),
+        "chart_colors": json.dumps([row["category__color"] for row in expense_by_category]),
+        "chart_values": json.dumps([float(row["total"]) for row in expense_by_category]),
     }
     return render(request, "finance/dashboard.html", context)
 

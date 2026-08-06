@@ -41,5 +41,6 @@
     </main>
 
     {% if debug %}{% django_browser_reload_script %}{% endif %}
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

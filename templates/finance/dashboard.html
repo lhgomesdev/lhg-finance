@@ -20,6 +20,17 @@
     <a href="{% url 'transaction-create' %}" class="btn btn-primary">+ Nova transação</a>
 </div>
 
+<div class="card chart-card">
+    <h2>Gastos por categoria (mês atual)</h2>
+    {% if chart_values != "[]" %}
+        <div class="chart-wrap">
+            <canvas id="expense-chart"></canvas>
+        </div>
+    {% else %}
+        <p class="chart-empty">Nenhuma despesa neste mês ainda.</p>
+    {% endif %}
+</div>
+
 <div class="card card-flush">
     <div class="card-header">
         <h2>Últimas transações</h2>
@@ -43,4 +54,28 @@
         <p class="card-empty">Nenhuma transação neste mês ainda.</p>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if chart_values != "[]" %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+    new Chart(document.getElementById("expense-chart"), {
+        type: "doughnut",
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                data: {{ chart_values|safe }},
+                backgroundColor: {{ chart_colors|safe }},
+                borderWidth: 0,
+            }],
+        },
+        options: {
+            plugins: {
+                legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 12 } } },
+            },
+        },
+    });
+</script>
+{% endif %}
 {% endblock %}

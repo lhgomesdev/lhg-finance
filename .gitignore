@@ -19,6 +19,9 @@ staticfiles/
 .idea/
 .claude/
 
+# Notas pessoais (nao publicas)
+PROJETO.md
+
 # OS
 .DS_Store
 Thumbs.db

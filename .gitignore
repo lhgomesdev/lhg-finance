@@ -18,6 +18,7 @@ staticfiles/
 .vscode/
 .idea/
 .claude/
+CLAUDE.md
 
 # Notas pessoais (nao publicas)
 PROJETO.md

@@ -151,3 +151,23 @@ if not DEBUG:
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# Config padrao do Django so manda erro pro console quando DEBUG=True (senao
+# tenta mandar e-mail via mail_admins, que nao esta configurado). Forca o
+# console sempre, senao exceptions em producao somem sem deixar rastro.
+# https://docs.djangoproject.com/en/6.1/topics/logging/
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}

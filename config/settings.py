@@ -49,6 +49,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # sempre instalado (registra a tag library usada em templates/base.html),
+    # mas o middleware/urls so entram com DEBUG=True — ver mais abaixo.
+    'django_browser_reload',
+
     'accounts',
     'finance',
 ]
@@ -65,7 +69,6 @@ MIDDLEWARE = [
 ]
 
 if DEBUG:
-    INSTALLED_APPS.append('django_browser_reload')
     MIDDLEWARE.append('django_browser_reload.middleware.BrowserReloadMiddleware')
     INTERNAL_IPS = ['127.0.0.1']
 

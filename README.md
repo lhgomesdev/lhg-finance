@@ -9,12 +9,16 @@
 
 App web de controle financeiro pessoal, multiusuário — cada usuário gerencia suas próprias finanças, separadas dos demais. Projeto pessoal e de portfólio.
 
+**🔗 No ar:** [finance.lhgomes.dev.br](https://finance.lhgomes.dev.br)
+
 ## ✨ Funcionalidades
 
 - **Transações:** cadastro, edição e exclusão de receitas e despesas, com data, descrição, valor e observações.
-- **Categorias:** categorias próprias por usuário, separadas por tipo (receita/despesa) e com cor de identificação.
-- **Dashboard:** visão geral das finanças com gráficos interativos (Chart.js).
+- **Categorias:** categorias próprias por usuário, separadas por tipo (receita/despesa) e com cor de identificação; todo usuário novo já recebe um conjunto padrão.
+- **Dashboard:** resumo do mês (receita/despesa/saldo) e gráfico de gastos por categoria (Chart.js).
+- **Listagem com filtro por mês:** navegação entre meses, com resumo do período.
 - **Multiusuário:** autenticação própria (Django `auth`) — cada conta enxerga só os seus dados.
+- **Dark mode:** segue o tema do sistema por padrão, com alternância manual salva por dispositivo.
 
 ## 🛠️ Stack
 
@@ -22,17 +26,19 @@ App web de controle financeiro pessoal, multiusuário — cada usuário gerencia
 - CSS puro (`static/css/main.css`, sem framework/build step)
 - Chart.js (via CDN, só no dashboard)
 - SQLite (dev local) / PostgreSQL via [Supabase](https://supabase.com) (produção)
-- Deploy: [Render](https://render.com), com WhiteNoise servindo os estáticos
+- Deploy: [Render](https://render.com), com WhiteNoise servindo os estáticos, atrás de domínio próprio via Cloudflare
 
 ## 📂 Estrutura do projeto
 
 ```
 lhg-finance/
-├── accounts/        # autenticação e contas de usuário
-├── finance/          # transações, categorias e dashboard
+├── accounts/        # autenticação, cadastro, comando ensure_superuser
+├── finance/          # transações, categorias, dashboard e CRUD
 ├── config/           # settings e urls do projeto Django
 ├── templates/         # templates HTML (base + por app)
 ├── static/            # CSS puro
+├── build.sh            # build de produção (Render): deps, collectstatic, migrate, superuser
+├── render.yaml           # Blueprint do Render
 ├── manage.py
 └── requirements.txt
 ```
@@ -53,6 +59,7 @@ Acesse `http://127.0.0.1:8000`. Sem `.env`, roda com SQLite e `DEBUG=True` por p
 ## ☁️ Deploy (Render + Supabase)
 
 1. **Banco (Supabase):** crie um projeto em [supabase.com](https://supabase.com) e copie a connection string em *Project Settings → Database → Connection string → URI*.
-2. **Web service (Render):** conecte este repositório em [render.com](https://render.com) — o `render.yaml` já configura build (`build.sh`: instala dependências, roda `collectstatic` e `migrate`) e start (`gunicorn config.wsgi:application`).
-3. Defina a variável de ambiente `DATABASE_URL` no painel do Render com a connection string do Supabase (`SECRET_KEY` já é gerada automaticamente pelo Blueprint).
-4. Depois do primeiro deploy, crie um superusuário via Shell do Render: `python manage.py createsuperuser`.
+2. **Web service (Render):** conecte este repositório em [render.com](https://render.com) — o `render.yaml` já configura build (`build.sh`: instala dependências, roda `collectstatic`, `migrate` e `ensure_superuser`) e start (`gunicorn config.wsgi:application`).
+3. Defina `DATABASE_URL` no painel do Render com a connection string do Supabase (`SECRET_KEY` já é gerada automaticamente pelo Blueprint).
+4. **Superusuário sem Shell** (indisponível no plano free): defina `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL` e `DJANGO_SUPERUSER_PASSWORD` como variáveis de ambiente — o `build.sh` cria o superusuário automaticamente (uma única vez; é seguro deixar rodando em todo deploy). Depois de confirmar que funcionou, remova `DJANGO_SUPERUSER_PASSWORD` do painel por segurança.
+5. **Domínio próprio:** em *Settings → Custom Domains* no Render, adicione o domínio e aponte um `CNAME` pra ele no seu provedor de DNS (`DNS only`, sem proxy, até o certificado SSL ser emitido). Adicione o domínio em `ALLOWED_HOSTS` e `https://` + domínio em `CSRF_TRUSTED_ORIGINS` nas variáveis de ambiente.

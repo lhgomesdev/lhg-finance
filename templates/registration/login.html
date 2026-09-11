@@ -5,6 +5,9 @@
     <h1>Entrar</h1>
     <form method="post">
         {% csrf_token %}
+        {% for error in form.non_field_errors %}
+            <p class="error-text">{{ error }}</p>
+        {% endfor %}
         {% for field in form %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>

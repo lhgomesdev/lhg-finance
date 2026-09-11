@@ -21,14 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config(
-    'SECRET_KEY',
-    default='django-insecure-)0g=c7()6%1456qab5!#(b90q(69m+37bw_cg#=2d1prcm9gf)',
-)
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# O fallback so vale em dev (DEBUG=True) — essa chave fica publica no repo,
+# entao se DEBUG=False e a env var SECRET_KEY nao estiver setada, e melhor
+# a aplicacao falhar ao subir do que rodar silenciosamente com uma chave
+# que qualquer um pode ver no GitHub.
+SECRET_KEY = config(
+    'SECRET_KEY',
+    default='django-insecure-)0g=c7()6%1456qab5!#(b90q(69m+37bw_cg#=2d1prcm9gf)' if DEBUG else None,
+)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
@@ -53,6 +57,8 @@ INSTALLED_APPS = [
     # mas o middleware/urls so entram com DEBUG=True — ver mais abaixo.
     'django_browser_reload',
 
+    'axes',
+
     'accounts',
     'finance',
 ]
@@ -66,7 +72,23 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # tem que vir por ultimo — ver AUTHENTICATION_BACKENDS abaixo
+    'axes.middleware.AxesMiddleware',
 ]
+
+# django-axes: bloqueia login apos varias tentativas falhas (protecao basica
+# contra forca bruta). O backend do axes precisa vir antes do ModelBackend
+# padrao pra poder interceptar e barrar a tentativa antes da autenticacao.
+# https://django-axes.readthedocs.io/
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1  # horas
+AXES_LOCKOUT_PARAMETERS = ['ip_address', 'username']
+AXES_RESET_ON_SUCCESS = True
 
 if DEBUG:
     MIDDLEWARE.append('django_browser_reload.middleware.BrowserReloadMiddleware')
@@ -151,6 +173,11 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 7
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Nao ha JS lendo o cookie de CSRF (o token vai via {% csrf_token %} no
+# proprio HTML), entao da pra travar o cookie contra leitura via JS tambem
+# em dev, sem custo nenhum.
+CSRF_COOKIE_HTTPONLY = True
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

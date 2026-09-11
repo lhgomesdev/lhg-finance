@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 
 import dj_database_url
+import sentry_sdk
 from decouple import Csv, config
+from sentry_sdk.integrations.django import DjangoIntegration
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -201,3 +203,18 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
+
+# Monitoramento de erros (Sentry). So ativa se SENTRY_DSN estiver configurado
+# (vazio em dev/CI, sem custo nenhum de nao ter a env var setada).
+SENTRY_DSN = config('SENTRY_DSN', default='')
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        environment='production' if not DEBUG else 'development',
+        # sem dados pessoais (nome/e-mail/IP) por padrao pros eventos do Sentry —
+        # o app guarda dados financeiros de usuarios reais.
+        send_default_pii=False,
+        traces_sample_rate=0.0,
+    )

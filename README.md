@@ -1,5 +1,6 @@
 # 💰 LHG Finance
 
+[![CI](https://github.com/lhgomesdev/lhg-finance/actions/workflows/ci.yml/badge.svg)](https://github.com/lhgomesdev/lhg-finance/actions/workflows/ci.yml)
 ![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)

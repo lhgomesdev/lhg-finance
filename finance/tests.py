@@ -158,3 +158,11 @@ class TransactionListMonthFilterTests(TestCase):
         response = self.client.get(reverse("transaction-list"), {"year": 2026, "month": 13})
 
         self.assertEqual(response.status_code, 200)
+
+
+class HealthzTests(TestCase):
+    def test_healthz_is_public_and_ok(self):
+        response = self.client.get(reverse("healthz"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"ok")
